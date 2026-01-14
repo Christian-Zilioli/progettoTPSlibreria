@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Waifu Pics Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    #waifu-img {
+      max-width: 300px;
+      border-radius: 10px;
+      margin-top: 20px;
+      transition: transform 0.3s ease;
+    }
+    #waifu-img:hover {
+      transform: scale(1.05);
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff69b4;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>✨ Waifu Pics API Demo</h1>
+  <button onclick="getRandomWaifu()">🎴 Mostra Waifu</button>
+
+  <div id="image-container">
+    <img id="waifu-img" src="" alt="Waifu Image">
+  </div>
+
+  <script>
+    async function getRandomWaifu() {
+      try {
+        const response = await fetch("https://api.waifu.pics/sfw/waifu");
+        const data = await response.json();
+        document.getElementById("waifu-img").src = data.url;
+      } catch (err) {
+        alert("Errore nel caricamento dell'immagine");
+        console.error(err);
+      }
+    }
+  </script>
+
+</body>
+</html>

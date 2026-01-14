@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Open Library Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .books {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .book {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .book img {
+      width: 120px;
+      height: 180px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .book h3 {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .book p {
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📚 Open Library Demo</h1>
+
+  <div class="search-box">
+    <input id="query" placeholder="Cerca un libro..." />
+    <button onclick="searchBooks()">Cerca</button>
+  </div>
+
+  <div class="books" id="books"></div>
+
+  <script>
+    async function searchBooks() {
+      const query = document.getElementById("query").value;
+      const booksDiv = document.getElementById("books");
+      booksDiv.innerHTML = "Caricamento...";
+
+      const res = await fetch(
+        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
+      );
+      const data = await res.json();
+
+      booksDiv.innerHTML = "";
+
+      data.docs.slice(0, 12).forEach(book => {
+        const coverId = book.cover_i;
+        const coverUrl = coverId
+          ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
+          : "https://via.placeholder.com/120x180?text=No+Cover";
+
+        const div = document.createElement("div");
+        div.className = "book";
+
+        div.innerHTML = `
+          <img src="${coverUrl}" />
+          <h3>${book.title}</h3>
+          <p>${book.author_name?.[0] || "Autore sconosciuto"}</p>
+          <p>${book.first_publish_year || ""}</p>
+        `;
+
+        booksDiv.appendChild(div);
+      });
+    }
+  </script>
+    <a href="b.html">AAAAAAAAAAAAAA</a>
+</body>
+</html>

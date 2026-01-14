@@ -43,7 +43,7 @@
   <script>
     async function getRandomWaifu() {
       try {
-        const response = await fetch("https://api.waifu.pics/sfw/waifu");
+        const response = await fetch("https://api.waifu.pics/nsfw/neko");
         const data = await response.json();
         document.getElementById("waifu-img").src = data.url;
       } catch (err) {

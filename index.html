@@ -1,112 +1,52 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Open Library Demo</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    .search-box {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    input {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 10px 15px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .books {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-    }
-
-    .book {
-      background: white;
-      padding: 10px;
-      border-radius: 5px;
-      text-align: center;
-    }
-
-    .book img {
-      width: 120px;
-      height: 180px;
-      object-fit: cover;
-      margin-bottom: 10px;
-    }
-
-    .book h3 {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-
-    .book p {
-      font-size: 12px;
-      color: #555;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Debug Console Serendipity</title>
 </head>
 <body>
+    <h1>Controlla la Console (F12)</h1>
+    <p>La ricerca è partita in automatico all'apertura della pagina.</p>
 
-  <h1>📚 Open Library Demo</h1>
+    <script type="module" src="richiesteAPI.js">
 
-  <div class="search-box">
-    <input id="query" placeholder="Cerca un libro..." />
-    <button onclick="searchBooks()">Cerca</button>
-  </div>
+        // Definiamo i filtri come hai chiesto
+        const filtriUtente = {
+            soggetto: "alchemy",
+            anno: 1700
+        };
 
-  <div class="books" id="books"></div>
+        const limite = 5;
 
-  <script>
-    async function searchBooks() {
-      const query = document.getElementById("query").value;
-      const booksDiv = document.getElementById("books");
-      booksDiv.innerHTML = "Caricamento...";
+        // Funzione di test immediata
+        async function avviaDebug() {
+            console.log("--- INIZIO TEST ANTI-ALGORITMO ---");
+            console.log("Filtri impostati:", filtriUtente);
 
-      const res = await fetch(
-        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
-      );
-      const data = await res.json();
+            const risultati = await cercaLibro(filtriUtente, limite);
 
-      booksDiv.innerHTML = "";
+            if (risultati.length > 0) {
+                console.log("SUCCESSO! Libri trovati:", risultati.length);
+                
+                // Mostriamo il primo libro come esempio dettagliato
+                console.log("Esempio primo libro (Istanza di classe Libro):", risultati[0]);
+                
+                // Testiamo il metodo della copertina
+                console.log("URL Copertina Grande del primo libro:", risultati[0].getCoverUrl('L'));
+                
+                // Stampiamo una tabella leggibile
+                console.table(risultati.map(l => ({
+                    Titolo: l.titolo,
+                    Autore: l.autori,
+                    ISBN: l.isbn,
+                    Anno: l.anno
+                })));
+            } else {
+                console.warn("Nessun risultato trovato. Verifica i parametri o la connessione.");
+            }
+        }
 
-      data.docs.slice(0, 12).forEach(book => {
-        const coverId = book.cover_i;
-        const coverUrl = coverId
-          ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
-          : "https://via.placeholder.com/120x180?text=No+Cover";
-
-        const div = document.createElement("div");
-        div.className = "book";
-
-        div.innerHTML = `
-          <img src="${coverUrl}" />
-          <h3>${book.title}</h3>
-          <p>${book.author_name?.[0] || "Autore sconosciuto"}</p>
-          <p>${book.first_publish_year || ""}</p>
-        `;
-
-        booksDiv.appendChild(div);
-      });
-    }
-  </script>
-    <a href="b.html">noemi figa assurda</a>
+        avviaDebug();
+    </script>
 </body>
 </html>

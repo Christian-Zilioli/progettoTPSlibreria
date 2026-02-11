@@ -1,4 +1,4 @@
-class Libro{
+export class Libro{
   constructor(data){
     this.id = data.key; 
     this.titolo = data.title;
@@ -8,15 +8,19 @@ class Libro{
     this.soggetti = data.subject ? data.subject.slice(0, 5) : [];
     this.coverId = data.cover_i;
   }
-  getCoverUrl(size) {
-    if(!size in 'SML') throw new TypeError("la grandezza dell immagine deve essere S, M o L");
+  getCoverUrl(size = 'M') {
+    const validSizes = ['S', 'M', 'L'];
+    if (!validSizes.includes(size)) {
+       throw new TypeError("la grandezza dell'immagine deve essere S, M o L");
+    }
+    
     return this.coverId 
       ? `https://covers.openlibrary.org/b/id/${this.coverId}-${size}.jpg`
       : "https://via.placeholder.com/150x200?text=No+Cover";
   }
 }
 
-async function cercaLibro(filtri = {}, limite) {
+export async function cercaLibro(filtri = {}, limite) {
   if(!Number.isInteger(limite)) throw new TypeError("Il limite deve essere un numero intero");
 
   const queryParams = new URLSearchParams();
@@ -31,7 +35,9 @@ async function cercaLibro(filtri = {}, limite) {
   }
 
   try {
-    const response = await fetch(`https://openlibrary.org/search.json?${queryParams}`);
+    const URLrichiesta = `https://openlibrary.org/search.json?${queryParams}`;
+    console.log(URLrichiesta);
+    const response = await fetch(URLrichiesta);
     if (!response.ok) throw new Error("Network response was not ok");
     
     const data = await response.json();

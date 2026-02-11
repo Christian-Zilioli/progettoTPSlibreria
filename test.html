@@ -8,12 +8,13 @@
     <h1>Controlla la Console (F12)</h1>
     <p>La ricerca è partita in automatico all'apertura della pagina.</p>
 
-    <script type="module" src="richiesteAPI.js">
-
+    <script type="module">
+        import { cercaLibro } from './richiesteAPI.js';
+        console.log("ciao");
         // Definiamo i filtri come hai chiesto
         const filtriUtente = {
             soggetto: "alchemy",
-            anno: 1700
+            anno: 2010
         };
 
         const limite = 5;

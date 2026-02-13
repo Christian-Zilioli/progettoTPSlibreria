@@ -16,12 +16,30 @@ export class Libro{
     
     return this.coverId 
       ? `https://covers.openlibrary.org/b/id/${this.coverId}-${size}.jpg`
-      : "https://via.placeholder.com/150x200?text=No+Cover";
+      : "https://placehold.co/150x200/eeeeee/555555?text=No+Cover";
   }
 }
 
-export async function cercaLibro(filtri = {}, limite) {
-  if(!Number.isInteger(limite)) throw new TypeError("Il limite deve essere un numero intero");
+export async function cercaLibro(URLrichiesta) {
+
+  try {
+    console.log(URLrichiesta);
+    const response = await fetch(URLrichiesta);
+    if (!response.ok) throw new Error("Network response was not ok");
+    
+    const data = await response.json();
+    
+    return data.docs.map(item => new Libro(item));
+  } catch (e) {
+    console.error("Errore nella scoperta:", e);
+    console.Error(URLrichiesta);
+    return [];
+  }
+}
+
+export function generaURL(filtri = {}, limite, pagina){
+  if(!Number.isInteger(limite) && limite <= 0) throw new TypeError("Il limite deve essere un numero intero maggiore di 0");
+  if(!Number.isInteger(pagina) && pagina <= 0) throw new TypeError("La pagina deve essere un numero intero maggiore di 0");
 
   const queryParams = new URLSearchParams();
   if (filtri.soggetto) queryParams.append("subject", filtri.soggetto);
@@ -32,24 +50,25 @@ export async function cercaLibro(filtri = {}, limite) {
     queryParams.append("first_publish_year", filtri.anno);
   }
   else if (filtri.anno) queryParams.append("first_publish_year", filtri.anno);
-  queryParams.append("limit", limite);
-  
-  if (queryParams.get("limit") === String(limite) && queryParams.size === 1) {
-    queryParams.append("q", "random"); 
-  }
 
-  try {
-    const URLrichiesta = `https://openlibrary.org/search.json?${queryParams}`;
-    console.log(URLrichiesta);
-    const response = await fetch(URLrichiesta);
-    if (!response.ok) throw new Error("Network response was not ok");
-    
-    const data = await response.json();
-    
-    return data.docs.map(item => new Libro(item));
-  } catch (e) {
-    console.error("Errore nella scoperta:", e);
-    return [];
-  }
+  queryParams.append("limit", limite);
+  queryParams.append("page", pagina);
+  if(queryParams.size === 2)queryParams.append("q", "random");
+  
+  return `https://openlibrary.org/search.json?${queryParams}`;
 }
 
+export async function getNumLibri(URL){
+  try{
+    const response = await fetch(URL)
+    if (!response.ok) throw new Error("Network response was not ok");
+
+    const data = await response.json();
+
+    return data["numFound"];
+  }catch (e) {
+    console.error("Errore nella scoperta:", e);
+    console.Error(URL);
+    return 1;
+  }
+}

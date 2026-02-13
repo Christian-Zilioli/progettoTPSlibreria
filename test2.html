@@ -179,20 +179,19 @@ header{
 </div>
 
 <script type="module">
-import { cercaLibro, cercaGeneri } from './richiesteAPI.js';
+import { cercaLibro, generaURL, getNumLibri } from './richiesteAPI.js';
 
-let pagina = 1;
+let pagina = 0;
+let pagMax = 1;
+let numLibri = 0;
 const limite = 12;
+let URLvecchio = "";
+let filtri = {}
+
 
 async function cerca(){
-  const filtri = {
-    titolo: titolo.value,
-    autore: autore.value,
-    anno: anno.value,
-    soggetto: soggetto.value
-  };
-
-  const risultati = await cercaLibro(filtri, limite);
+  const URL = generaURL(filtri, limite, pagina);
+  const risultati = await cercaLibro(URL);
   mostraLibri(risultati);
 }
 
@@ -220,54 +219,17 @@ function mostraLibri(lista){
   });
 }
 
-// AUTOCOMPLETE PER GENERE
-let timeoutId = null;
-soggetto.addEventListener('input', async (e) => {
-  clearTimeout(timeoutId);
-  const valore = e.target.value.trim();
-  
-  if (valore.length === 0) {
-    dropdownGeneri.classList.remove('show');
-    return;
-  }
-
-  // Attendiamo un po' prima di fare la richiesta (debounce)
-  timeoutId = setTimeout(async () => {
-    const generi = await cercaGeneri(valore);
-    
-    dropdownGeneri.innerHTML = "";
-    
-    if (generi.length === 0) {
-      dropdownGeneri.classList.remove('show');
-      return;
-    }
-
-    generi.forEach(genere => {
-      const item = document.createElement('div');
-      item.className = 'autocomplete-item';
-      item.textContent = genere;
-      
-      item.addEventListener('click', () => {
-        soggetto.value = genere;
-        dropdownGeneri.classList.remove('show');
-      });
-
-      dropdownGeneri.appendChild(item);
-    });
-
-    dropdownGeneri.classList.add('show');
-  }, 300);
-});
-
-// Chiudi dropdown quando clicchi fuori
-document.addEventListener('click', (e) => {
-  if (e.target !== soggetto) {
-    dropdownGeneri.classList.remove('show');
-  }
-});
-
 cercaBtn.onclick=()=>{
+  filtri = {
+    titolo: titolo.value,
+    autore: autore.value,
+    anno: anno.value,
+    soggetto: soggetto.value
+  };
   pagina=1;
+  const URL = generaURL(filtri, limite, pagina);
+  numLibri = getNumLibri(URL);
+  pagMax = Math.ceil(numLibri / limite);
   cerca();
 };
 
@@ -279,8 +241,11 @@ prev.onclick=()=>{
 };
 
 next.onclick=()=>{
-  pagina++;
-  cerca();
+  if(pagina != pagMax){
+    pagina++;
+    cerca();
+  }
+  
 };
 </script>
 

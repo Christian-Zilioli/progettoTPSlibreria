@@ -25,10 +25,14 @@ export async function cercaLibro(filtri = {}, limite) {
 
   const queryParams = new URLSearchParams();
   if (filtri.soggetto) queryParams.append("subject", filtri.soggetto);
-  if (filtri.anno) queryParams.append("first_publish_year", filtri.anno);
   if (filtri.autore) queryParams.append("author", filtri.autore);
   if (filtri.titolo) queryParams.append("title", filtri.titolo);
-  queryParams.append("limit", limite)
+  if(queryParams.size === 0 && filtri.anno){
+    queryParams.append("q", "random");
+    queryParams.append("first_publish_year", filtri.anno);
+  }
+  else if (filtri.anno) queryParams.append("first_publish_year", filtri.anno);
+  queryParams.append("limit", limite);
   
   if (queryParams.get("limit") === String(limite) && queryParams.size === 1) {
     queryParams.append("q", "random"); 
@@ -48,3 +52,4 @@ export async function cercaLibro(filtri = {}, limite) {
     return [];
   }
 }
+

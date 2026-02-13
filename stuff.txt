@@ -1,0 +1,3 @@
+- paginazione dei libri con offset o page dell'api open library
+- filtro generi con input autocomplete https://openlibrary.org/subjects/fantasy.json
+- implementazione di google books api per maggiori info

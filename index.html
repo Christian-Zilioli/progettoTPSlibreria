@@ -207,6 +207,29 @@ function mostraLibri(lista){
     const card = document.createElement("div");
     card.className="card";
 
+    card.onclick = () => {
+      const params = new URLSearchParams({
+        id: libro.id,
+        titolo: libro.titolo,
+        autore: libro.autori,
+        isbn: libro.isbn || ""
+      });
+
+      sessionStorage.setItem("libroSelezionato",
+        JSON.stringify({
+          key: libro.id,
+          title: libro.titolo,
+          author_name: libro.autori.split(", "),
+          isbn: libro.isbn ? [libro.isbn] : [],
+          first_publish_year: libro.anno,
+          cover_i: libro.coverId,
+          subject: libro.soggetti
+        })
+      );
+
+      window.location.href = "dettagli.html";
+    };
+
     card.innerHTML=`
       <img src="${libro.getCoverUrl('M')}">
       <h3>${libro.titolo}</h3>

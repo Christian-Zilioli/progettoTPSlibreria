@@ -1,4 +1,8 @@
 - VVV paginazione dei libri con offset o page dell'api open library 
 - filtro generi con input autocomplete https://openlibrary.org/subjects/fantasy.json
-- implementazione di google books api per maggiori info
+- VVV implementazione di google books api per maggiori info
 - filtro lingua
+- animazione caricamento
+- libri di tendenza per la pagina principale
+- gestione errori api
+- ? preferiti con db e login

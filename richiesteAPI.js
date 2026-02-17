@@ -53,6 +53,19 @@ export class Libro{
       this.lingua = _libro.language || null;
       this.previewLink = _libro.previewLink || null;
 
+      this.categorie = _libro.categories || [];
+      this.rating = _libro.averageRating || null;
+      this.numeroVoti = _libro.ratingsCount || null;
+      this._libroLink = _libro._libroLink || null;
+
+      // === RECUPERO ISBN SE MANCA ===
+      if (this.isbn == "N/A") {
+        const isbn13 = _libro.industryIdentifiers.find(id => id.type === "ISBN_13");
+        const isbn10 = _libro.industryIdentifiers.find(id => id.type === "ISBN_10");
+
+        this.isbn = isbn13?.identifier || isbn10?.identifier || null;
+      }
+
       this._dettagliCaricati = true;
       
     }catch (e) {
@@ -77,11 +90,10 @@ export async function cercaLibro(URLrichiesta) {
     
     return data.docs.map(item => new Libro(item));
   } catch (e) {
-    console.error("Errore nella scoperta:", e);
-    console.error(URLrichiesta);
-    return [];
+    throw e;
   }
 }
+
 
 export function generaURL(filtri = {}, limite, pagina){
   if(!Number.isInteger(limite) || limite <= 0) throw new TypeError("Il limite deve essere un numero intero maggiore di 0");
@@ -118,5 +130,22 @@ export async function getNumLibri(URL){
     console.error(URL);
     return 1;
   }
+}
+
+export async function cercaLibriTrend(periodo) {
+  const validPeriodi = ["daily", "weekly", "monthly"];
+  if(!validPeriodi.includes(periodo)) throw new TypeError("il periodo deve essere: daily o weekly o monthly");
+   try {
+    const URLrichiesta = `https://openlibrary.org/trending/${periodo}.json?limit=24`;
+    const response = await fetch(URLrichiesta);
+    if (!response.ok) throw new Error("Network response was not ok");
+    
+    const data = await response.json();
+    
+    console.log(URLrichiesta);
+    return data.works.map(item => new Libro(item));
+  } catch (e) {
+    throw e;  
+  }   
 }
 

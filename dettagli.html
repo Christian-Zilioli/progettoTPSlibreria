@@ -4,106 +4,17 @@
 <meta charset="UTF-8">
 <title>Dettagli Libro</title>
 
-<style>
-
-body{
-  margin:0;
-  font-family:Segoe UI, sans-serif;
-  background:#f2f4f8;
-}
-
-/* HEADER */
-
-header{
-  background:#1e293b;
-  color:white;
-  padding:20px;
-  text-align:center;
-  font-size:26px;
-  font-weight:bold;
-}
-
-/* CONTENITORE */
-
-.container{
-  max-width:900px;
-  margin:30px auto;
-  background:white;
-  border-radius:12px;
-  padding:30px;
-  box-shadow:0 3px 10px rgba(0,0,0,.1);
-
-  display:grid;
-  grid-template-columns:250px 1fr;
-  gap:30px;
-}
-
-/* COVER */
-
-.cover img{
-  width:100%;
-  border-radius:8px;
-}
-
-/* INFO */
-
-.info h2{
-  margin-top:0;
-}
-
-.info p{
-  margin:8px 0;
-  color:#444;
-}
-
-.label{
-  font-weight:bold;
-}
-
-/* DESCRIZIONE */
-
-.descrizione{
-  grid-column:1 / -1;
-  margin-top:20px;
-  line-height:1.6;
-}
-
-/* BOTTONI */
-
-.actions{
-  grid-column:1 / -1;
-  display:flex;
-  justify-content:space-between;
-  margin-top:20px;
-}
-
-.actions a,
-.actions button{
-  padding:10px 20px;
-  border:none;
-  background:#2563eb;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
-  text-decoration:none;
-}
-
-.actions a:hover,
-.actions button:hover{
-  background:#1d4ed8;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>📘 Dettagli Libro</header>
 
-<div class="container" id="contenuto">
-
-  <p>Caricamento...</p>
-
+<div class="detail-wrapper">
+  <div class="container" id="contenuto">
+    <p>Caricamento...</p>
+  </div>
 </div>
 
 <script type="module">
@@ -134,44 +45,75 @@ function mostra(){
 
   div.innerHTML = `
 
-    <div class="cover">
-      <img src="${libro.getCoverUrl('L')}">
+  <div class="cover">
+    <img src="${libro.googleThumbnail || libro.getCoverUrl('L')}" alt="${libro.titolo}">
+  </div>
+
+  <div class="info">
+
+    <h2>${libro.titolo}</h2>
+    <p class="autore">${libro.autori}</p>
+
+    <div class="meta-row">
+      ${libro.anno ? `<span class="badge">${libro.anno}</span>` : ""}
+      ${libro.lingua ? `<span class="badge badge-secondary">${libro.lingua.toUpperCase()}</span>` : ""}
+      ${libro.pagine ? `<span class="badge badge-light">${libro.pagine} pagine</span>` : ""}
     </div>
 
-    <div class="info">
+    ${libro.rating ? `
+      <p class="rating">
+        ⭐ ${libro.rating} 
+        <span class="votes">(${libro.numeroVoti || 0} voti)</span>
+      </p>
+    ` : ""}
 
-      <h2>${libro.titolo}</h2>
-
-      <p><span class="label">Autore:</span> ${libro.autori}</p>
-      <p><span class="label">Anno:</span> ${libro.anno}</p>
+    <div class="info-grid">
       <p><span class="label">Editore:</span> ${libro.editore || "N/A"}</p>
-      <p><span class="label">Pagine:</span> ${libro.pagine || "N/A"}</p>
-      <p><span class="label">Lingua:</span> ${libro.lingua || "N/A"}</p>
       <p><span class="label">ISBN:</span> ${libro.isbn || "N/A"}</p>
-
+      ${libro.dataPubblicazione ? `<p><span class="label">Pubblicazione:</span> ${libro.dataPubblicazione}</p>` : ""}
     </div>
 
-    <div class="descrizione">
+    ${
+      libro.categorie && libro.categorie.length > 0
+        ? `
+        <div class="categorie">
+          ${libro.categorie
+            .map(cat => `<span class="badge badge-outline">${cat}</span>`)
+            .join("")}
+        </div>
+        `
+        : ""
+    }
 
-      <h3>Descrizione</h3>
+  </div>
 
-      <p>${libro.descrizione || "Nessuna descrizione disponibile."}</p>
+  <div class="descrizione">
 
-    </div>
+    <h3>Descrizione</h3>
+    <p>${libro.descrizione || "Nessuna descrizione disponibile."}</p>
 
-    <div class="actions">
+  </div>
 
-      <a href="index.html">⬅ Torna alla ricerca</a>
+  <div class="actions">
 
-      ${
-        libro.previewLink
-          ? `<a href="${libro.previewLink}" target="_blank">📖 Anteprima</a>`
-          : ""
-      }
+    <a href="index.html">⬅ Torna alla ricerca</a>
 
-    </div>
+    ${
+      libro.previewLink
+        ? `<a href="${libro.previewLink}" target="_blank">📖 Anteprima</a>`
+        : ""
+    }
 
-  `;
+    ${
+      libro.infoLink
+        ? `<a href="${libro.infoLink}" target="_blank">ℹ️ Google Books</a>`
+        : ""
+    }
+
+  </div>
+
+`;
+
 }
 
 caricaDettagli();

@@ -4,156 +4,7 @@
 <meta charset="UTF-8">
 <title>Book Finder</title>
 
-<style>
-body{
-  margin:0;
-  font-family:Segoe UI, sans-serif;
-  background:#f2f4f8;
-}
-
-/* HEADER */
-header{
-  background:#1e293b;
-  color:white;
-  padding:20px;
-  text-align:center;
-  font-size:28px;
-  font-weight:bold;
-}
-
-/* SEARCH BAR */
-.search-box{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  padding:20px;
-  flex-wrap:wrap;
-}
-
-.search-box input{
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  width:200px;
-}
-
-.search-box button{
-  padding:10px 20px;
-  border:none;
-  background:#2563eb;
-  color:white;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.search-box button:hover{
-  background:#1d4ed8;
-}
-
-/* GRID RISULTATI */
-#risultati{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:20px;
-  padding:20px;
-}
-
-/* CARD LIBRO */
-.card{
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
-  text-align:center;
-  transition:.2s;
-}
-
-.card:hover{
-  transform:scale(1.03);
-}
-
-.card img{
-  height:200px;
-  object-fit:cover;
-  margin-bottom:10px;
-}
-
-.card h3{
-  font-size:18px;
-  margin:5px 0;
-}
-
-.card p{
-  font-size:14px;
-  color:#555;
-  margin:3px 0;
-}
-
-/* PAGINAZIONE */
-.pagination{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  padding:20px;
-}
-
-.pagination button{
-  padding:10px 15px;
-  border:none;
-  background:#334155;
-  color:white;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.pagination button:disabled{
-  background:#9ca3af;
-  cursor:not-allowed;
-}
-
-/* AUTOCOMPLETE */
-.autocomplete-container {
-  position: relative;
-  width: 200px;
-}
-
-.autocomplete-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  display: none;
-  z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.autocomplete-dropdown.show {
-  display: block;
-}
-
-.autocomplete-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: 0.2s;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
-
-.autocomplete-item:hover {
-  background: #e0e7ff;
-  color: #2563eb;
-}
-
-.autocomplete-item:last-child {
-  border-bottom: none;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -165,11 +16,14 @@ header{
   <input id="autore" placeholder="Autore">
   <input id="anno" placeholder="Anno">
   <div class="autocomplete-container">
-    <input id="soggetto" placeholder="Soggetto">
+    <input id="soggetto" placeholder="genere">
     <div id="dropdownGeneri" class="autocomplete-dropdown"></div>
   </div>
   <button id="cercaBtn">Cerca</button>
 </section>
+
+<div id="loader" class="loader"></div>
+<section id="risultati"></section>
 
 <section id="risultati"></section>
 
@@ -179,27 +33,39 @@ header{
 </div>
 
 <script type="module">
-import { cercaLibro, generaURL, getNumLibri } from './richiesteAPI.js';
+import { Libro, cercaLibro, generaURL, getNumLibri, cercaLibriTrend } from './richiesteAPI.js';
 
 let pagina = 0;
-let pagMax = 1;
+let pagMax = 0;
 let numLibri = 0;
 const limite = 12;
 let URLvecchio = "";
 let filtri = {}
 
+const risultatiContainer = document.getElementById("risultati");
+const loader = document.getElementById("loader");
+
 
 async function cerca(){
-  const URL = generaURL(filtri, limite, pagina);
-  const risultati = await cercaLibro(URL);
-  mostraLibri(risultati);
+  risultatiContainer.innerHTML="";
+  loader.style.display = "block";
+  try{
+    const URL = generaURL(filtri, limite, pagina);
+    const risLibri = await cercaLibro(URL);
+    loader.style.display = "none";
+    mostraLibri(risLibri);
+  }catch(e){
+    loader.style.display = "none";
+    risultatiContainer.innerHTML = `<div class="errore-api">⚠️ Errore nel caricamento dei dati. Riprova.</div>`;
+    console.error(e);
+  }
 }
 
 function mostraLibri(lista){
-  risultati.innerHTML="";
+  risultatiContainer.innerHTML="";
 
   if(lista.length===0){
-    risultati.innerHTML="<h2>Nessun risultato</h2>";
+    risultatiContainer.innerHTML="<h2>Nessun risultato</h2>";
     return;
   }
 
@@ -238,8 +104,23 @@ function mostraLibri(lista){
       <p><b>ISBN:</b> ${libro.isbn ?? "N/A"}</p>
     `;
 
-    risultati.appendChild(card);
+    risultatiContainer.appendChild(card);
   });
+}
+
+async function generaTrend(){
+  risultatiContainer.innerHTML="";
+
+  loader.style.display = "block";
+  try{
+    const libriTrend = await cercaLibriTrend("weekly");
+    loader.style.display = "none";
+    mostraLibri(libriTrend);
+  }catch(e){
+    loader.style.display = "none";
+    risultatiContainer.innerHTML = `<div class="errore-api">⚠️ Errore nel caricamento dei dati. Riprova.</div>`;
+    console.error(e);
+  }
 }
 
 cercaBtn.onclick=()=>{
@@ -270,6 +151,8 @@ next.onclick=()=>{
   }
   
 };
+
+generaTrend();
 </script>
 
 </body>

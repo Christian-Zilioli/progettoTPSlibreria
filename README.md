@@ -1,8 +1,8 @@
-# 📚 Book Finder
+#  Book Finder
 
 Book Finder è un'applicazione web moderna e reattiva per la ricerca di libri, che integra dati provenienti da **Open Library** e  **Google Books API** . Il progetto permette di esplorare i libri di tendenza, effettuare ricerche mirate e visualizzare dettagli approfonditi come descrizioni, numero di pagine e valutazioni.
 
-## 🚀 Funzionalità
+##  Funzionalità
 
 * **Esplorazione Trend:** All'avvio, l'app mostra i libri più popolari della settimana tramite il sistema di trending di Open Library.
 * **Ricerca Avanzata:** Filtra i libri per titolo, autore, anno di pubblicazione e genere (soggetto).
@@ -15,7 +15,7 @@ Book Finder è un'applicazione web moderna e reattiva per la ricerca di libri, c
 
 ---
 
-## 🛠️ Struttura Tecnologica
+##  Struttura Tecnologica
 
 Il progetto è sviluppato in  **JavaScript , HTML e CSS** seguendo un approccio a moduli.
 

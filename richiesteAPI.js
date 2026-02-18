@@ -58,7 +58,7 @@ export class Libro{
       this.numeroVoti = _libro.ratingsCount || null;
       this._libroLink = _libro._libroLink || null;
 
-      // === RECUPERO ISBN SE MANCA ===
+      // cerca nuovo isbn se manca
       if (this.isbn == "N/A") {
         const isbn13 = _libro.industryIdentifiers.find(id => id.type === "ISBN_13");
         const isbn10 = _libro.industryIdentifiers.find(id => id.type === "ISBN_10");

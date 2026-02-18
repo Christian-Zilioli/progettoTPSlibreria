@@ -74,12 +74,6 @@ function mostraLibri(lista){
     card.className="card";
 
     card.onclick = () => {
-      const params = new URLSearchParams({
-        id: libro.id,
-        titolo: libro.titolo,
-        autore: libro.autori,
-        isbn: libro.isbn || ""
-      });
 
       sessionStorage.setItem("libroSelezionato",
         JSON.stringify({
